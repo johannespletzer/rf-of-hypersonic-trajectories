@@ -1,0 +1,2 @@
+# rf_of_hypersonic_trajectories
+The repository provides a Python Class, an example and an executable main.py-file to calculate the climate impact (stratosphere adjusted radiative forcing) of hypersonic aircraft trajectories (LH2 propulsion). In detail, the radiative forcing of water vapour changes and ozone changes are calculated on the basis of water vapour, hydrogen and nitrogen oxide emissions. 
