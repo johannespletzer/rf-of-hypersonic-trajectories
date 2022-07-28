@@ -19,4 +19,4 @@ The software requires various functions from the following python modules:
 - scipy
 
 # Getting started
-The software currently only works with .mat files. They have to be placed in the subfolder 'Data', which is extracted from the rf_of_trajectories.zip.
+The software currently only works with mat files. They have to be placed in the subfolder 'Data', which is extracted from the rf_of_trajectories.zip. The current main.py executable reads all trajectory files within 'Data' and returns the calculated radiative forcing in an xlsx file.
