@@ -19,6 +19,8 @@ The software requires various functions from the following python modules:
 - scipy
 - glob
 
+Install the required packages with `pip install numpy pandas xarray scipy glob`.
+
 # Getting started
 To get started extract the zip file. This stores the Python Class and required input data in your local folder. The software currently only works with mat files. They have to be placed in the extracted subfolder 'Data'. The current main.py executable reads all trajectory files within 'Data' and returns the calculated radiative forcing in an xlsx file.
 
