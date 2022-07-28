@@ -21,3 +21,6 @@ The software requires various functions from the following python modules:
 
 # Getting started
 To get started extract the zip file. This stores the Python Class and required input data in your local folder. The software currently only works with mat files. They have to be placed in the extracted subfolder 'Data'. The current main.py executable reads all trajectory files within 'Data' and returns the calculated radiative forcing in an xlsx file.
+
+# Code quality
+The code was formatted according to PEP 8 style with the help of the modules 'flake8' and 'black'.
