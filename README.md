@@ -9,6 +9,7 @@ Interpolation (30-38 km) and extrapolation 0-30 km are used. It is recommended t
 - Meaningful results can be expected from the radiative effect of ozone changes due to water vapour, hydrogen and nitrogen oxide emissions.
 
 The atmospheric and radiative sensitivites are based on results from Pletzer et al (2023, in prep.).
+
 # Python environment requirements
 The software requires various functions from the following python modules:
 
@@ -16,3 +17,6 @@ The software requires various functions from the following python modules:
 - pandas
 - xarray
 - scipy
+
+# Getting started
+The software currently only works with .mat files. They have to be placed in the subfolder 'Data', which is extracted from the rf_of_trajectories.zip.
