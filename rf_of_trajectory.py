@@ -1,4 +1,3 @@
-
 class rf_of_trajectory:
     """The class contains multiple functions to calculate the radiative forcing of a .mat aircraft trajectory file. First developed by Johannes Pletzer (DLR) for Daniel Bodmer (TUHH). The calculations are based on pandas data structure.It is highly recommended to use the mask of tropospheric emission, since calculations are interpolated for altitudes from 30-38 km and extrapolated for all others, which potentially introduces a large error."""
 
@@ -234,7 +233,7 @@ class rf_of_trajectory:
             1.65,
             1.34,
             1.34,
-        ]  # values from sensitivity simulations
+        ]
         rf_h2o_38 = [
             1.89,
             1.89,
@@ -244,7 +243,7 @@ class rf_of_trajectory:
             1.82,
             1.59,
             1.59,
-        ]  # doubled for missing latitude regions
+        ]
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
@@ -302,7 +301,7 @@ class rf_of_trajectory:
             2.97,
             1.62,
             1.62,
-        ]  # values from sensitivity simulations
+        ]
         rf_h2o_38 = [
             9.12,
             9.12,
@@ -312,7 +311,7 @@ class rf_of_trajectory:
             8.34,
             5.50,
             5.50,
-        ]  # doubled for missing latitude regions
+        ]
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
@@ -406,9 +405,7 @@ class rf_of_trajectory:
         df_h2o = self.h2o_rf_from_h2o_emis()
 
         # Calculate net of all individual h2o radiative forcings
-        net = (
-            df_h2o["H2O RF [mW m-2]"].sum()
-        )
+        net = df_h2o["H2O RF [mW m-2]"].sum()
 
         return net
 
