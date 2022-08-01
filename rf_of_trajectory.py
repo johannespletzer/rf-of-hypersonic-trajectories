@@ -8,20 +8,20 @@ class rf_of_trajectory:
 
         self.to_numeric = to_numeric
 
-        self.O3_RF_30_H2O = [-3.04, -3.04, -3.04, -2.46, -2.46, -2.13, -1.75, -1.75]
-        self.O3_RF_38_H2O = [-3.81, -3.81, -3.81, -2.59, -2.59, -2.72, -2.46, -2.46]
+        self.O3_RF_30KM_H2O = [-3.04, -3.04, -3.04, -2.46, -2.46, -2.13, -1.75, -1.75]
+        self.O3_RF_38KM_H2O = [-3.81, -3.81, -3.81, -2.59, -2.59, -2.72, -2.46, -2.46]
 
-        self.O3_RF_30_H2 = [-0.20, -0.20, -0.20, -0.08, -0.08, -0.12, -0.12, -0.12]
-        self.O3_RF_38_H2 = [-0.19, -0.19, -0.19, -0.07, -0.07, -0.09, -0.13, -0.13]
+        self.O3_RF_30KM_H2 = [-0.20, -0.20, -0.20, -0.08, -0.08, -0.12, -0.12, -0.12]
+        self.O3_RF_38KM_H2 = [-0.19, -0.19, -0.19, -0.07, -0.07, -0.09, -0.13, -0.13]
 
-        self.O3_RF_30_NO = [127.0, 127.0, 127.0, 129.9, 129.9, 91.6, 69.9, 69.9]
-        self.O3_RF_38_NO = [102.9, 102.9, 102.9, 48.2, 48.2, 66.9, 74.3, 74.3]
+        self.O3_RF_30KM_NO = [127.0, 127.0, 127.0, 129.9, 129.9, 91.6, 69.9, 69.9]
+        self.O3_RF_38KM_NO = [102.9, 102.9, 102.9, 48.2, 48.2, 66.9, 74.3, 74.3]
 
-        self.H2O_RF_30_H2O = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
-        self.H2O_RF_38_H2O = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
+        self.H2O_RF_30KM_H2O = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
+        self.H2O_RF_38KM_H2O = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
 
-        self.H2O_RF_30_H2 = [5.17, 5.17, 5.17, 7.76, 7.76, 2.97, 1.62, 1.62]
-        self.H2O_RF_38_H2 = [9.12, 9.12, 9.12, 11.96, 11.96, 8.34, 5.50, 5.50]
+        self.H2O_RF_30KM_H2 = [5.17, 5.17, 5.17, 7.76, 7.76, 2.97, 1.62, 1.62]
+        self.H2O_RF_38KM_H2 = [9.12, 9.12, 9.12, 11.96, 11.96, 8.34, 5.50, 5.50]
 
     def load_trajectory_as_dataframe(self):
         """This function creates a DataFrame from a MatLab file and selects certain variables."""
@@ -216,7 +216,7 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30_H2O, self.O3_RF_38_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_, self.O3_RF_30KM_H2O, self.O3_RF_38KM_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -238,7 +238,7 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.H2O_RF_30_H2O, self.H2O_RF_38_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_, self.H2O_RF_30KM_H2O, self.H2O_RF_38KM_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -260,7 +260,7 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30_H2, self.O3_RF_38_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_, self.O3_RF_30KM_H2, self.O3_RF_38KM_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -282,7 +282,7 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.H2O_RF_30_H2, self.H2O_RF_38_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_, self.H2O_RF_30KM_H2, self.H2O_RF_38KM_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -304,7 +304,7 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30_NO, self.O3_RF_38_NO, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_, self.O3_RF_30KM_NO, self.O3_RF_38KM_NO, "RF / Tg [30 km]", "RF / Tg [38 km]"
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
