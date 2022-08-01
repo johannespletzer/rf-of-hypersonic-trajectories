@@ -13,14 +13,14 @@ def main():
     """Main code. Loads files and extracts labels, calculates radiative forcing, writes to excel file."""
 
     files = glob("./Data/*Traj*.mat")
-    labels = [a.split("ory_")[-1].split("_2022")[0] for a in files] 
+    labels = [a.split("ory_")[-1].split("_2022")[0] for a in files]
 
     # Create lists for each radiative forcing
     tot_rf = []
     h2o_rf = []
     o3_rf = []
 
-    # Calculate radiative forcing for each trajectory 
+    # Calculate radiative forcing for each trajectory
     for file in files:
         rf = rf_of_trajectory(file.split()[-1])
 
@@ -28,14 +28,15 @@ def main():
         rf.load_trajectory_as_dataframe()
 
         # Mask values below tropopause
-        rf.drop_vertical_levels()  
+        rf.drop_vertical_levels()
 
         tot_rf.append(rf.total_rf())
         h2o_rf.append(rf.total_h2o_rf())
         o3_rf.append(rf.total_o3_rf())
 
-    # Write results to excel file 
+    # Write results to excel file
     rf_to_excel(labels, tot_rf, h2o_rf, o3_rf)
+
 
 if __name__ == "__main__":
     main()

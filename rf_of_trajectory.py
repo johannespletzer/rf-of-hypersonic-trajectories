@@ -20,9 +20,6 @@ class rf_of_trajectory:
         self.H2O_RF_30KM_H2O = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
         self.H2O_RF_38KM_H2O = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
 
-        self.H2O_RF_30KM_H2 = [5.17, 5.17, 5.17, 7.76, 7.76, 2.97, 1.62, 1.62]
-        self.H2O_RF_38KM_H2 = [9.12, 9.12, 9.12, 11.96, 11.96, 8.34, 5.50, 5.50]
-
     def load_trajectory_as_dataframe(self):
         """This function creates a DataFrame from a MatLab file and selects certain variables."""
 
@@ -216,7 +213,11 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30KM_H2O, self.O3_RF_38KM_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_,
+            self.O3_RF_30KM_H2O,
+            self.O3_RF_38KM_H2O,
+            "RF / Tg [30 km]",
+            "RF / Tg [38 km]",
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -238,7 +239,11 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.H2O_RF_30KM_H2O, self.H2O_RF_38KM_H2O, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_,
+            self.H2O_RF_30KM_H2O,
+            self.H2O_RF_38KM_H2O,
+            "RF / Tg [30 km]",
+            "RF / Tg [38 km]",
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
@@ -260,34 +265,16 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30KM_H2, self.O3_RF_38KM_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_,
+            self.O3_RF_30KM_H2,
+            self.O3_RF_38KM_H2,
+            "RF / Tg [30 km]",
+            "RF / Tg [38 km]",
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
         # calculate radiative forcing
         data_["O3 RF [mW m-2]"] = self.remove_emission_normalization(
-            data_, "H2 [kg]", "RF"
-        )
-        data_.drop(["RF / Tg"], axis=1, inplace=True)
-
-        # clean and set dtype
-        data_ = data_.apply(self.to_numeric, downcast="float", errors="coerce")
-
-        return data_
-
-    def h2o_rf_from_h2_emis(self):
-        """This function calculates the water vapour radiative forcing due to hydrogen emission."""
-
-        data_ = self.file.copy()
-
-        # use interp and weight functions
-        data_ = self.horizontal_interp(
-            data_, self.H2O_RF_30KM_H2, self.H2O_RF_38KM_H2, "RF / Tg [30 km]", "RF / Tg [38 km]"
-        )
-        data_ = self.vertical_interp(data_, "RF / Tg")
-
-        # radiative forcing
-        data_["H2O RF [mW m-2]"] = self.remove_emission_normalization(
             data_, "H2 [kg]", "RF"
         )
         data_.drop(["RF / Tg"], axis=1, inplace=True)
@@ -304,7 +291,11 @@ class rf_of_trajectory:
 
         # use interp and weight functions
         data_ = self.horizontal_interp(
-            data_, self.O3_RF_30KM_NO, self.O3_RF_38KM_NO, "RF / Tg [30 km]", "RF / Tg [38 km]"
+            data_,
+            self.O3_RF_30KM_NO,
+            self.O3_RF_38KM_NO,
+            "RF / Tg [30 km]",
+            "RF / Tg [38 km]",
         )
         data_ = self.vertical_interp(data_, "RF / Tg")
 
