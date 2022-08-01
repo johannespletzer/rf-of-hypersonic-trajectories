@@ -11,7 +11,7 @@ def main():
     """Main code. Loads files and extracts labels, calculates radiative forcing, writes to excel file."""
 
     files = glob("./Data/*Traj*.mat")
-    labels = list(map(lambda a: a.split("ory_")[-1].split("_2022")[0], files))
+    labels = [a.split("ory_")[-1].split("_2022")[0] for a in files] 
 
     # Create lists for each radiative forcing
     tot_rf = []
@@ -19,7 +19,7 @@ def main():
     o3_rf = []
 
     # Calculate radiative forcing for each trajectory 
-    for i, file in enumerate(files):
+    for file in files:
         rf = rf_of_trajectory(file.split()[-1])
 
         # Load data
