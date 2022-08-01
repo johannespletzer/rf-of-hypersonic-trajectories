@@ -82,8 +82,8 @@ class rf_of_trajectory:
 
         return df
 
-    def horizontal_interp(self, data, val_30_km, val_38_km, var1, var2):
-        """This function interpolates input values to latitude of DataFrame columns."""
+    def horizontal_interp(self, data, val_30_km, val_38_km, var_30km, var_38km):
+        """This function interpolates input values to latitude of DataFrame columns. Beware to use to the correct input."""
 
         from numpy import abs
 
@@ -102,10 +102,10 @@ class rf_of_trajectory:
         func_38_tropic = interp1d(x, val_38_km, kind="cubic")
 
         # linear interp. above 45° N, S; cubic below 45° N, S
-        data_[var1] = data_["Latitude"].apply(
+        data_[var_30km] = data_["Latitude"].apply(
             lambda x: func_30_tropic(x) if abs(x) <= 45 else func_30_polar(x)
         )
-        data_[var2] = data_["Latitude"].apply(
+        data_[var_38km] = data_["Latitude"].apply(
             lambda x: func_38_tropic(x) if abs(x) <= 45 else func_38_polar(x)
         )
 
