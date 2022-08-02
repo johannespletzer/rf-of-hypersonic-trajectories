@@ -17,7 +17,7 @@ def main():
         filepath = sys.argv[1]
     except IndexError:
         print(
-            "You have to add the path to the data like 'python3 main.py <path_to_trajectory_data>"
+            "\n\tDon't forget to add the filepath like 'python3 main.py <path_to_trajectory_data>'\n"
         )
         sys.exit(1)
 
