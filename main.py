@@ -1,5 +1,7 @@
 """Python file to read Trajectory .mat files from the folder 'data' and return the radiative forcing as an excel file."""
 
+import sys
+
 from glob import glob
 
 from pandas import DataFrame, ExcelWriter
@@ -11,8 +13,13 @@ from package import rf_of_trajectory as rt
 
 def main():
     """Main code. Loads files and extracts labels, calculates radiative forcing, writes to excel file."""
+    try:
+        filepath = sys.argv[1]
+    except IndexError:
+        print("You have to add the path to the data like 'python3 main.py <path_to_trajectory_data>")
+        sys.exit(1)
 
-    files = glob("./Data/*Traj*.mat")
+    files = glob(filepath+"/*Traj*.mat")
     labels = [a.split("ory_")[-1].split("_2022")[0] for a in files]
 
     # Create lists for each radiative forcing
