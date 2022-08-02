@@ -16,16 +16,16 @@ def main():
     try:
         filepath = sys.argv[1]
     except IndexError:
-        print("You have to add the path to the data like 'python3 main.py <path_to_trajectory_data>")
+        print(
+            "You have to add the path to the data like 'python3 main.py <path_to_trajectory_data>"
+        )
         sys.exit(1)
 
-    files = glob(filepath+"/*Traj*.mat")
+    files = glob(filepath + "/*Traj*.mat")
     labels = [a.split("ory_")[-1].split("_2022")[0] for a in files]
 
     # Create lists for each radiative forcing
-    tot_rf = []
-    h2o_rf = []
-    o3_rf = []
+    tot_rf, h2o_rf, o3_rf = [], [], []
 
     # Calculate radiative forcing for each trajectory
     for file in files:

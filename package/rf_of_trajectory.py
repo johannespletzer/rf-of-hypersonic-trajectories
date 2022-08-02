@@ -7,7 +7,8 @@ class rf_of_trajectory:
         from pandas import to_numeric
 
         from os import path
-        self.resources_dir = path.join(path.dirname(__file__), 'resources')
+
+        self.resources_dir = path.join(path.dirname(__file__), "resources")
 
         self.to_numeric = to_numeric
 
@@ -158,7 +159,9 @@ class rf_of_trajectory:
         from numpy import nan
         from xarray import open_dataset
 
-        tp = open_dataset(self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc")
+        tp = open_dataset(
+            self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
+        )
         tp = tp.mean("timem").tp_WMO.to_series()
 
         # get index from trajectory data_
@@ -185,7 +188,9 @@ class rf_of_trajectory:
             # load tropopause variable tp_WMO as pandas series
             from xarray import open_dataset
 
-            tp = open_dataset(self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc")
+            tp = open_dataset(
+                self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
+            )
             tp = tp.mean("timem").tp_WMO.to_series()
 
             # get index from trajectory data_
