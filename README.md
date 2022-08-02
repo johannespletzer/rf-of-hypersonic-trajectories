@@ -23,7 +23,7 @@ The software requires various functions from the following python modules:
 Install the required packages with `pip install numpy pandas xarray scipy xlsxwriter glob`.
 
 # Getting started
-To get started extract the zip file. This stores the required input data in your local folder. The software currently only works with mat files. They have to be placed in the extracted subfolder 'Data'. The main.py executable reads all trajectory files within 'Data' and returns the calculated radiative forcing in an xlsx file.
+The software currently only works with mat files. They have to be store within one folder. The main.py executable reads all trajectory files within the folder and returns the calculated radiative forcing in an xlsx file. Execute main.py with `python3 main.py <path_to_your_trajectory_files>`.
 
 # Code quality
 The code was formatted according to PEP 8 style with the help of the modules 'flake8' and 'black'.

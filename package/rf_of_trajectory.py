@@ -6,13 +6,17 @@ class rf_of_trajectory:
 
         from pandas import to_numeric
 
+        from os import path
+
+        self.resources_dir = path.join(path.dirname(__file__), "resources")
+
         self.to_numeric = to_numeric
 
-        self.O3_RF_30KM_H2O = [-3.04, -3.04, -3.04, -2.46, -2.46, -2.13, -1.75, -1.75]
-        self.O3_RF_38KM_H2O = [-3.81, -3.81, -3.81, -2.59, -2.59, -2.72, -2.46, -2.46]
+        self.O3_RF_30KM_H2 = [-3.04, -3.04, -3.04, -2.46, -2.46, -2.13, -1.75, -1.75]
+        self.O3_RF_38KM_H2 = [-3.81, -3.81, -3.81, -2.59, -2.59, -2.72, -2.46, -2.46]
 
-        self.O3_RF_30KM_H2 = [-0.20, -0.20, -0.20, -0.08, -0.08, -0.12, -0.12, -0.12]
-        self.O3_RF_38KM_H2 = [-0.19, -0.19, -0.19, -0.07, -0.07, -0.09, -0.13, -0.13]
+        self.O3_RF_30KM_H2O = [-0.20, -0.20, -0.20, -0.08, -0.08, -0.12, -0.12, -0.12]
+        self.O3_RF_38KM_H2O = [-0.19, -0.19, -0.19, -0.07, -0.07, -0.09, -0.13, -0.13]
 
         self.O3_RF_30KM_NO = [127.0, 127.0, 127.0, 129.9, 129.9, 91.6, 69.9, 69.9]
         self.O3_RF_38KM_NO = [102.9, 102.9, 102.9, 48.2, 48.2, 66.9, 74.3, 74.3]
@@ -155,7 +159,9 @@ class rf_of_trajectory:
         from numpy import nan
         from xarray import open_dataset
 
-        tp = open_dataset("Data/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc")
+        tp = open_dataset(
+            self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
+        )
         tp = tp.mean("timem").tp_WMO.to_series()
 
         # get index from trajectory data_
@@ -182,7 +188,9 @@ class rf_of_trajectory:
             # load tropopause variable tp_WMO as pandas series
             from xarray import open_dataset
 
-            tp = open_dataset("Data/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc")
+            tp = open_dataset(
+                self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
+            )
             tp = tp.mean("timem").tp_WMO.to_series()
 
             # get index from trajectory data_

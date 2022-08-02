@@ -1,28 +1,35 @@
 """Python file to read Trajectory .mat files from the folder 'data' and return the radiative forcing as an excel file."""
 
+import sys
+
 from glob import glob
 
 from pandas import DataFrame, ExcelWriter
 
-from rf_to_excel import rf_to_excel
+from package import rf_to_excel as re
 
-from rf_of_trajectory import rf_of_trajectory
+from package import rf_of_trajectory as rt
 
 
 def main():
     """Main code. Loads files and extracts labels, calculates radiative forcing, writes to excel file."""
+    try:
+        filepath = sys.argv[1]
+    except IndexError:
+        print(
+            "\n\tDon't forget to add the filepath like 'python3 main.py <path_to_trajectory_data>'\n"
+        )
+        sys.exit(1)
 
-    files = glob("./Data/*Traj*.mat")
+    files = glob(filepath + "/*Traj*.mat")
     labels = [a.split("ory_")[-1].split("_2022")[0] for a in files]
 
     # Create lists for each radiative forcing
-    tot_rf = []
-    h2o_rf = []
-    o3_rf = []
+    tot_rf, h2o_rf, o3_rf = [], [], []
 
     # Calculate radiative forcing for each trajectory
     for file in files:
-        rf = rf_of_trajectory(file.split()[-1])
+        rf = rt.rf_of_trajectory(file.split()[-1])
 
         # Load data
         rf.load_trajectory_as_dataframe()
@@ -35,7 +42,7 @@ def main():
         o3_rf.append(rf.total_o3_rf())
 
     # Write results to excel file
-    rf_to_excel(labels, tot_rf, h2o_rf, o3_rf)
+    re.rf_to_excel(labels, tot_rf, h2o_rf, o3_rf)
 
 
 if __name__ == "__main__":
