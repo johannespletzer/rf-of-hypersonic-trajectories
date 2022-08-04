@@ -26,4 +26,4 @@ Install the required packages with `pip install numpy pandas xarray scipy xlsxwr
 The software currently only works with mat files. They have to be stored within one folder. The main.py executable reads all trajectory files within the folder and returns the calculated radiative forcing in an xlsx file. Execute main.py with `python3 main.py <path_to_your_trajectory_files>`.
 
 # Code quality
-The code was formatted according to PEP 8 style with the help of the modules 'flake8' and 'black'.
+The code was formatted according to PEP 8 style with the help of the modules 'flake8', 'isort', 'pylint' and 'black'.
