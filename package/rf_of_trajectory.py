@@ -23,7 +23,7 @@ class RadiativeForcingTrajectory:
         self.resources_dir = path.join(path.dirname(__file__), "resources")
 
         # outer edges and mid points of latitude regions
-        lat_mid_point = [-90, -75, -45, -15, 15, 45, 75, 90]
+        self.lat_mid_point = [-90, -75, -45, -15, 15, 45, 75, 90]
 
         # sensitivities for outer edges and mid points of latitude regions
         self.o3_rf_at_30_km_for_h2 = [
