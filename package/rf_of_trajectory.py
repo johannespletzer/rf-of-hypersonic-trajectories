@@ -8,7 +8,7 @@ from scipy.io import loadmat
 from xarray import open_dataset
 
 
-class RadiativeForcingTrajectory:
+class RadiativeForcingOfTrajectory:
     """The class contains multiple functions to calculate the radiative forcing
     of a .mat aircraft trajectory file. First developed by Johannes Pletzer (DLR)
     for Daniel Bodmer (TUHH). The calculations are based on pandas data structure.

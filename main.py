@@ -31,7 +31,7 @@ def main():
 
     # Calculate radiative forcing for each trajectory
     for file in files:
-        trajectory = rot.RadiativeForcingTrajectory(file.split()[-1])
+        trajectory = rot.RadiativeForcingOfTrajectory(file.split()[-1])
 
         # Load data
         trajectory.load_trajectory_as_dataframe()
