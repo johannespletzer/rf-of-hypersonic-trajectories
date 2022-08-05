@@ -3,7 +3,7 @@ The repository provides a Python Class, an example and an executable to calculat
 
 # Limitations
 Interpolation (30-38 km) and extrapolation 0-30 km are used. It is recommended to note the following:
-- The class includes a function that masks emission in the troposphere and excludes it from the climate calculation. Its use is strongly recommended.
+- The class includes a function (`drop_vertical_levels()`) that drops emission in the troposphere or below specified altitude levels and excludes it from the climate calculation. Its use is strongly recommended.
 - The climate impact of trajectories where the average flight altitude does not correspond to the typical hypersonic flight altitudes (about 24-40 km) should not be estimated.
 - Meaningful results can be expected for the radiative effect of water vapour changes due to water vapour emissions. This explicitly excludes the radiative effect of water vapour changes due to hydrogen and nitrogen oxide emissions.
 - Meaningful results can be expected for the radiative effect of ozone changes due to water vapour, hydrogen and nitrogen oxide emissions.
