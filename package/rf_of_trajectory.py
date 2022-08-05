@@ -200,37 +200,6 @@ class RadiativeForcingTrajectory:
 
         return data_["new_col"]
 
-    def mask_troposphere(self, data, variable):
-        """This function sets variable values, where the
-        altitude is below the tropopause, to NaN."""
-
-        data_ = data.copy()
-
-        # load tropopause variable tp_WMO as pandas series
-
-        tropause = open_dataset(
-            self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
-        )
-        tropause = tropause.mean("timem").tp_WMO.to_series()
-
-        # get index from trajectory data_
-        idx = data_[["Latitude", "Longitude"]].set_index(["Latitude", "Longitude"])
-        idx.index.rename(["lat", "lon"], inplace=True)
-
-        # reindex and interpolate tropopause data_ to trajectory index
-        data_["tp_WMO"] = (
-            tropause.reindex(tropause.index.union(idx.index))
-            .interpolate()
-            .reindex_like(idx)
-            .values
-        )
-
-        # mask data_ below tropopause, drop tropopause variable
-        data_.loc[(data_["Altitude [Pa]"] > data_["tp_WMO"]), variable] = nan
-        data_.drop(["tp_WMO"], axis=1, inplace=True)
-
-        return data_[variable]
-
     def drop_vertical_levels(self, alt=True):
         """This function removes rows, where the altitude is below
         the tropopause or another altitude. Input value has to be
