@@ -22,6 +22,10 @@ class RadiativeForcingTrajectory:
 
         self.resources_dir = path.join(path.dirname(__file__), "resources")
 
+        # outer edges and mid points of latitude regions
+        lat_mid_point = [-90, -75, -45, -15, 15, 45, 75, 90]
+
+        # sensitivities for outer edges and mid points of latitude regions
         self.o3_rf_at_30_km_for_h2 = [
             -3.04,
             -3.04,
@@ -141,16 +145,13 @@ class RadiativeForcingTrajectory:
 
         data_ = self.data.copy()
 
-        # outer edges and mid points of latitude regions
-        lat_mid_point = [-90, -75, -45, -15, 15, 45, 75, 90]
-
         # define interpolation functions (linear, cubic)
 
-        func_30_polar = interp1d(lat_mid_point, val_30_km, kind="linear")
-        func_30_tropic = interp1d(lat_mid_point, val_30_km, kind="cubic")
+        func_30_polar = interp1d(self.lat_mid_point, val_30_km, kind="linear")
+        func_30_tropic = interp1d(self.lat_mid_point, val_30_km, kind="cubic")
 
-        func_38_polar = interp1d(lat_mid_point, val_38_km, kind="linear")
-        func_38_tropic = interp1d(lat_mid_point, val_38_km, kind="cubic")
+        func_38_polar = interp1d(self.lat_mid_point, val_38_km, kind="linear")
+        func_38_tropic = interp1d(self.lat_mid_point, val_38_km, kind="cubic")
 
         # linear interp. above 45° N, S; cubic below 45° N, S
         data_[var_30km] = data_["Latitude"].apply(
