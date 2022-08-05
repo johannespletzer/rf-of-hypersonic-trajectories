@@ -3,7 +3,7 @@
 from pandas import DataFrame, ExcelWriter
 
 
-def rf_to_excel(labels, tot_rf, h2o_rf, o3_rf):
+def to_excel(labels, tot_rf, h2o_rf, o3_rf):
     """Function to export the radiative forcings to an excel file"""
 
     # Create DataFrame from lists

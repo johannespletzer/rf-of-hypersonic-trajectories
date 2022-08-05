@@ -5,7 +5,7 @@ import sys
 
 from glob import glob
 
-from package import rf_to_excel as rte
+from package import to_excel as rte
 
 from package import rf_of_trajectory as rot
 
@@ -44,7 +44,7 @@ def main():
         o3_rf.append(trajectory.total_o3_rf())
 
     # Write results to excel file
-    rte.rf_to_excel(labels, tot_rf, h2o_rf, o3_rf)
+    rte.to_excel(labels, tot_rf, h2o_rf, o3_rf)
 
 
 if __name__ == "__main__":
