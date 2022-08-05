@@ -154,7 +154,7 @@ class RadiativeForcingOfTrajectory:
         the tropopause or another altitude. Input value has to be
         in hectopascal. Default is below the tropopause."""
 
-        if alt:
+        if alt is True:
             # load tropopause variable tp_WMO as pandas series
             tropause = open_dataset(
                 self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
