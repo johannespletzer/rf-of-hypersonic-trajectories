@@ -324,7 +324,7 @@ class RadiativeForcingOfTrajectory:
         return net
 
     def total_emis(self):
-        """This function returns a list of the mass emissioni
+        """This function returns a list of the mass emission
         in tons (H2O, H2, NO) for the selected altitude."""
 
         # Calculate mass emission
