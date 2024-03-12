@@ -1,7 +1,7 @@
 # Radiative forcing of hypersonic aircraft trajectories
 The repository provides a Python package, an example and an executable to calculate the climate impact (stratosphere adjusted radiative forcing) of hypersonic aircraft trajectories. The radiative forcing of water vapour changes and ozone changes are calculated on the basis of water vapour, hydrogen and nitrogen oxide emissions. 
 
-The latest release is [![DOI](https://zenodo.org/badge/518852238.svg)](https://zenodo.org/badge/latestdoi/518852238)
+Latest release: [![DOI](https://zenodo.org/badge/518852238.svg)](https://zenodo.org/badge/latestdoi/518852238)
 
 # Limitations
 Interpolation (30-38 km) and extrapolation 0-30 km are used. It is recommended to note the following:
@@ -10,7 +10,7 @@ Interpolation (30-38 km) and extrapolation 0-30 km are used. It is recommended t
 - Meaningful results can be expected for the radiative effect of water vapour changes due to water vapour emissions. This explicitly excludes the radiative effect of water vapour changes due to hydrogen and nitrogen oxide emissions.
 - Meaningful results can be expected for the radiative effect of ozone changes due to water vapour, hydrogen and nitrogen oxide emissions.
 
-The atmospheric and radiative sensitivites are based on results from [Pletzer et al (2023, preprint)](https://doi.org/10.5194/egusphere-2023-1777).
+The atmospheric and radiative sensitivites are based on results from [Pletzer et al (2024)](https://acp.copernicus.org/articles/24/1743/2024/).
 
 # Python environment requirements
 The software requires various functions from the following python modules:
