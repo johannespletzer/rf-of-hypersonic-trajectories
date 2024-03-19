@@ -24,25 +24,7 @@ class RadiativeForcing:
 
         self.resources_dir = path.join(path.dirname(__file__), "resources")
 
-        # outer edges and mid points of latitude regions
-        self.lat_mid_point = [-90, -75, -45, -15, 15, 45, 75, 90]
-
-        # sensitivities for outer edges and mid points of latitude regions
-        self.o3_rf_at_30_km_for_h2 = [-3.04, -3.04, -3.04, -2.46, -2.46, -2.13, -1.75, -1.75]
-
-        self.o3_rf_at_38_km_for_h2 = [-3.81, -3.81, -3.81, -2.59, -2.59, -2.72, -2.46, -2.46]
-
-        self.o3_rf_at_30_km_for_h2o = [-0.20, -0.20, -0.20, -0.08, -0.08, -0.12, -0.12, -0.12]
-
-        self.o3_rf_at_38_km_for_h2o = [-0.19, -0.19, -0.19, -0.07, -0.07, -0.09, -0.13, -0.13]
-
-        self.o3_rf_at_30_km_for_no = [127.0, 127.0, 127.0, 129.9, 129.9, 91.6, 69.9, 69.9]
-
-        self.o3_rf_at_38_km_for_no = [102.9, 102.9, 102.9, 48.2, 48.2, 66.9, 74.3, 74.3]
-
-        self.h2o_rf_at_30_km_for_h2o = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
-
-        self.h2o_rf_at_38_km_for_h2o = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
+        self.load_sensitivities()
 
         if self.filepath.endswith('.mat'):
             self.data = self.load_mat_as_dataframe()
@@ -51,6 +33,24 @@ class RadiativeForcing:
         else:
             file_format = self.filepath.split('.')[-1]
             raise OSError(f'Unknown format: {file_format}')
+
+    def load_sensitivities(self):
+        """Load radiative sensitivities calculated with numerical climate model
+        from file and store as lists"""
+
+        with open(self.resources_dir+'/rf_sensitivities.txt', encoding='UTF-8') as f:
+            self.rf_sens = [[float(x) for x in line.split(',')] for line in f]
+
+        # Sensitivities for outer edges and mid points of latitude regions
+        self.lat_mid_point           = self.rf_sens[0]
+        self.o3_rf_at_30_km_for_h2   = self.rf_sens[1]
+        self.o3_rf_at_38_km_for_h2   = self.rf_sens[2]
+        self.o3_rf_at_30_km_for_h2o  = self.rf_sens[3]
+        self.o3_rf_at_38_km_for_h2o  = self.rf_sens[4]
+        self.o3_rf_at_30_km_for_no   = self.rf_sens[5]
+        self.o3_rf_at_38_km_for_no   = self.rf_sens[6]
+        self.h2o_rf_at_30_km_for_h2o = self.rf_sens[7]
+        self.h2o_rf_at_38_km_for_h2o = self.rf_sens[8]
 
     def load_mat_as_dataframe(self):
         """This function creates a DataFrame from a MatLab file and selects certain variables."""
@@ -120,25 +120,26 @@ class RadiativeForcing:
         data_frame = data_frame[data_frame[['H2','H2O','NO']].sum(axis=1) != 0]
         data_frame.reset_index(inplace=True)
 
-#        columns = [
-#                    "time",
-#                    "Altitude [ft]",
-#                    "Latitude",
-#                    "Longitude",
-#                    "H2 [kg/km3]",
-#                    "NO [kg/km3]",
-#                    "H2O [kg/km3]",
-#                    "Fuel",
-#                    "distkm",
-#                    "Area [km2]"
-#                ]
-#
-#        data_frame.columns = columns
+        columns = [
+                    "time",
+                    "Altitude [ft]",
+                    "Latitude",
+                    "Longitude",
+                    "H2 [kg/km3]",
+                    "NO [kg/km3]",
+                    "H2O [kg/km3]",
+                    "Fuel",
+                    "distkm",
+                    "Area [km2]"
+                ]
+
+        data_frame.columns = columns
 
         # Altitude calculations
         data_frame["Altitude [km]"] = data_frame["Altitude [ft]"] * 0.3048 / 1000
-        func = lambda km: alt2press(km, alt_units='km', press_units='pa')
-        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(func)
+        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(
+                                        lambda km: alt2press(km, alt_units='km', press_units='pa')
+                                        )
 
         # Grid calculations
         data_frame["Volume [km3]"] = data_frame["Altitude [km]"] * data_frame["Area [km2]"]
@@ -148,8 +149,9 @@ class RadiativeForcing:
         data_frame["H2O [kg]"] = data_frame["H2O [kg/km3]"] * data_frame["Volume [km3]"]
         data_frame["NO [kg]"] = data_frame["NO [kg/km3]"] * data_frame["Volume [km3]"]
 
-        # Final DataFrame
-        columns = ["Latitude", "Longitude", "Altitude [km]", "Altitude [Pa]", "H2 [kg]", "H2O [kg]", "NO [kg]"]
+        # Filter for final DataFrame
+        columns = ["Latitude", "Longitude", "Altitude [km]",
+                   "Altitude [Pa]", "H2 [kg]", "H2O [kg]", "NO [kg]"]
         data_frame = data_frame[columns]
 
         return data_frame
