@@ -17,7 +17,7 @@ def to_excel(labels, tot_rf, h2o_rf, o3_rf):
     data_frame.set_index("Trajectory", inplace=True)
 
     # Write excel file
-    writer = ExcelWriter("rf_of_trajectories.xlsx")
+    writer = ExcelWriter("output_rf.xlsx")
     data_frame.to_excel(
         writer,
         sheet_name="Radiative Forcing",

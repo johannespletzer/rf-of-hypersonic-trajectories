@@ -10,10 +10,9 @@ from scipy.io import loadmat
 from xarray import open_dataset
 
 
-class RadiativeForcingOfTrajectory:
+class RadiativeForcing:
     """The class contains multiple functions to calculate the radiative forcing
-    of a .mat aircraft trajectory file. First developed by Johannes Pletzer (DLR)
-    for Daniel Bodmer (TUHH). The calculations are based on pandas data structure.
+    of trace gases emitted up to 40 km. The calculations are based on pandas data structure.
     It is highly recommended to use the mask of tropospheric emission, since
     calculations are interpolated for altitudes from 30-38 km and extrapolated´
     for all others, which potentially introduces a large error."""
