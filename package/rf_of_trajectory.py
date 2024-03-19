@@ -2,7 +2,9 @@
 
 from os import path
 
-from pandas import DataFrame, to_numeric
+from package.calculate_area import calculate_area as ca
+from pandas import DataFrame, to_numeric, merge
+from aerocalc3.std_atm import alt2press
 from scipy.interpolate import interp1d
 from scipy.io import loadmat
 from xarray import open_dataset
@@ -17,6 +19,7 @@ class RadiativeForcingOfTrajectory:
     for all others, which potentially introduces a large error."""
 
     def __init__(self, filepath):
+        
         self.filepath = filepath
 
         self.resources_dir = path.join(path.dirname(__file__), "resources")
@@ -40,10 +43,16 @@ class RadiativeForcingOfTrajectory:
         self.h2o_rf_at_30_km_for_h2o = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
 
         self.h2o_rf_at_38_km_for_h2o = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
+        
+        if self.filepath.endswith('.mat'):
+            self.data = self.load_mat_as_dataframe()
+        elif self.filepath.endswith('.nc'):
+            self.data = self.load_nc_as_dataframe()
+        else:
+            raise OSError('Unknown format: %r' % (self.filepath.split('.')[-1]))
+                
 
-        self.data = self.load_trajectory_as_dataframe()
-
-    def load_trajectory_as_dataframe(self):
+    def load_mat_as_dataframe(self):
         """This function creates a DataFrame from a MatLab file and selects certain variables."""
 
         mat = loadmat(self.filepath, squeeze_me=True)
@@ -95,6 +104,51 @@ class RadiativeForcingOfTrajectory:
             ]
         ]
         data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
+
+        return data_frame
+    
+    def load_nc_as_dataframe(self):
+        """This function creates a DataFrame from a netcdf file and selects certain variables."""
+
+        nc = open_dataset(self.filepath)
+        
+        nc['Area [km2]'] = ca(nc.lon,nc.lat) / 1e6
+        
+        data_frame = nc.to_dataframe()
+        
+        # Increase calculation speed by removing rows with zero emission
+        data_frame = data_frame[data_frame[['H2','H2O','NO']].sum(axis=1) != 0]
+        data_frame.reset_index(inplace=True)
+        
+        columns = [
+                    "time",
+                    "Altitude [ft]",
+                    "Latitude",
+                    "Longitude",
+                    "H2 [kg/km3]",
+                    "NO [kg/km3]",
+                    "H2O [kg/km3]",
+                    "Fuel",
+                    "distkm",
+                    "Area [km2]"
+                ]
+
+        data_frame.columns = columns
+
+        # Altitude calculations
+        data_frame["Altitude [km]"] = data_frame["Altitude [ft]"] * 0.3048 / 1000
+        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(lambda km: alt2press(km, alt_units='km', press_units='pa'))
+        
+        # Grid calculations
+        data_frame["Volume [km3]"] = data_frame["Altitude [km]"] * data_frame["Area [km2]"]
+        
+        # Mass calculations
+        data_frame["H2 [kg]"] = data_frame["H2 [kg/km3]"] * data_frame["Volume [km3]"]
+        data_frame["H2O [kg]"] = data_frame["H2O [kg/km3]"] * data_frame["Volume [km3]"]
+        data_frame["NO [kg]"] = data_frame["NO [kg/km3]"] * data_frame["Volume [km3]"]
+
+        # Final DataFrame
+        data_frame = data_frame[['Latitude', 'Longitude', 'Altitude [km]', 'Altitude [Pa]', 'H2 [kg]', 'H2O [kg]', 'NO [kg]']]
 
         return data_frame
 
@@ -156,28 +210,30 @@ class RadiativeForcingOfTrajectory:
 
         if alt is True:
             # load tropopause variable tp_WMO as pandas series
-            tropause = open_dataset(
+            tropopause = open_dataset(
                 self.resources_dir + "/STRATOFLY_1.0_SC0_X_tp-T42L90MA_X-X.nc"
             )
-            tropause = tropause.mean("timem").tp_WMO.to_series()
+            tropopause = tropopause.mean("timem").tp_WMO.to_series()
 
-            # get index from trajectory data
-            idx = self.data[["Latitude", "Longitude"]].set_index(
-                ["Latitude", "Longitude"]
-            )
-            idx.index.rename(["lat", "lon"], inplace=True)
+            idx = self.data[["Latitude", "Longitude", "Altitude [km]"]]\
+                            .set_index(["Latitude", "Longitude", "Altitude [km]"])
 
-            # reindex and interpolate tropopause data to trajectory index
-            self.data["tp_WMO"] = (
-                tropause.reindex(tropause.index.union(idx.index))
-                .interpolate()
-                .reindex_like(idx)
-                .values
-            )
+            idx.index.rename(["lat", "lon", "alt"], inplace=True)
+
+            merged_idx = merge(tropopause, idx, how='outer', left_index=True, right_index=True)
+
+            tropopause_reidx = tropopause.reindex_like(merged_idx)
+            tropopause_reidx = tropopause_reidx.interpolate().reindex_like(idx).reset_index()
+
+            tropopause_reidx.columns = ["Latitude", "Longitude", "Altitude [km]", "tp_WMO [Pa]"]
+
+            self.data = merge(tropopause_reidx, self.data
+                              , left_on=["Latitude", "Longitude", "Altitude [km]"]
+                              , right_on=["Latitude", "Longitude", "Altitude [km]"])
 
             # drop data below tropopause, drop tropopause variable
             self.data.drop(
-                self.data[self.data["Altitude [Pa]"] > self.data["tp_WMO"]].index,
+                self.data[self.data["Altitude [Pa]"] > self.data["tp_WMO [Pa]"]].index,
                 inplace=True,
             )
         else:
