@@ -2,12 +2,13 @@
 
 from os import path
 
-from package.calculate_area import calculate_area as ca
-from pandas import DataFrame, to_numeric, merge
 from aerocalc3.std_atm import alt2press
+from pandas import DataFrame, merge, to_numeric
 from scipy.interpolate import interp1d
 from scipy.io import loadmat
 from xarray import open_dataset
+
+from package.calculate_area import calculate_area as ca
 
 
 class RadiativeForcing:
@@ -18,7 +19,7 @@ class RadiativeForcing:
     for all others, which potentially introduces a large error."""
 
     def __init__(self, filepath):
-        
+
         self.filepath = filepath
 
         self.resources_dir = path.join(path.dirname(__file__), "resources")
@@ -42,14 +43,14 @@ class RadiativeForcing:
         self.h2o_rf_at_30_km_for_h2o = [1.70, 1.70, 1.70, 1.90, 1.90, 1.65, 1.34, 1.34]
 
         self.h2o_rf_at_38_km_for_h2o = [1.89, 1.89, 1.89, 1.97, 1.97, 1.82, 1.59, 1.59]
-        
+
         if self.filepath.endswith('.mat'):
             self.data = self.load_mat_as_dataframe()
         elif self.filepath.endswith('.nc'):
             self.data = self.load_nc_as_dataframe()
         else:
-            raise OSError('Unknown format: %r' % (self.filepath.split('.')[-1]))
-                
+            file_format = self.filepath.split('.')[-1]
+            raise OSError(f'Unknown format: {file_format}')
 
     def load_mat_as_dataframe(self):
         """This function creates a DataFrame from a MatLab file and selects certain variables."""
@@ -105,49 +106,51 @@ class RadiativeForcing:
         data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
 
         return data_frame
-    
+
     def load_nc_as_dataframe(self):
         """This function creates a DataFrame from a netcdf file and selects certain variables."""
 
-        nc = open_dataset(self.filepath)
-        
-        nc['Area [km2]'] = ca(nc.lon,nc.lat) / 1e6
-        
-        data_frame = nc.to_dataframe()
-        
+        nc_file = open_dataset(self.filepath)
+
+        nc_file['Area [km2]'] = ca(nc_file.lon,nc_file.lat) / 1e6
+
+        data_frame = nc_file.to_dataframe()
+
         # Increase calculation speed by removing rows with zero emission
         data_frame = data_frame[data_frame[['H2','H2O','NO']].sum(axis=1) != 0]
         data_frame.reset_index(inplace=True)
-        
-        columns = [
-                    "time",
-                    "Altitude [ft]",
-                    "Latitude",
-                    "Longitude",
-                    "H2 [kg/km3]",
-                    "NO [kg/km3]",
-                    "H2O [kg/km3]",
-                    "Fuel",
-                    "distkm",
-                    "Area [km2]"
-                ]
 
-        data_frame.columns = columns
+#        columns = [
+#                    "time",
+#                    "Altitude [ft]",
+#                    "Latitude",
+#                    "Longitude",
+#                    "H2 [kg/km3]",
+#                    "NO [kg/km3]",
+#                    "H2O [kg/km3]",
+#                    "Fuel",
+#                    "distkm",
+#                    "Area [km2]"
+#                ]
+#
+#        data_frame.columns = columns
 
         # Altitude calculations
         data_frame["Altitude [km]"] = data_frame["Altitude [ft]"] * 0.3048 / 1000
-        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(lambda km: alt2press(km, alt_units='km', press_units='pa'))
-        
+        func = lambda km: alt2press(km, alt_units='km', press_units='pa')
+        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(func)
+
         # Grid calculations
         data_frame["Volume [km3]"] = data_frame["Altitude [km]"] * data_frame["Area [km2]"]
-        
+
         # Mass calculations
         data_frame["H2 [kg]"] = data_frame["H2 [kg/km3]"] * data_frame["Volume [km3]"]
         data_frame["H2O [kg]"] = data_frame["H2O [kg/km3]"] * data_frame["Volume [km3]"]
         data_frame["NO [kg]"] = data_frame["NO [kg/km3]"] * data_frame["Volume [km3]"]
 
         # Final DataFrame
-        data_frame = data_frame[['Latitude', 'Longitude', 'Altitude [km]', 'Altitude [Pa]', 'H2 [kg]', 'H2O [kg]', 'NO [kg]']]
+        columns = ["Latitude", "Longitude", "Altitude [km]", "Altitude [Pa]", "H2 [kg]", "H2O [kg]", "NO [kg]"]
+        data_frame = data_frame[columns]
 
         return data_frame
 
@@ -332,7 +335,7 @@ class RadiativeForcing:
         """This function returns the net radiative forcing from ozone
         (H2O, H2, NO emission) and water vapour (H2O emission)."""
 
-        # calculate radiative forcings for each point of trajectory
+        # Calculate individual radiative forcings
         self.h2o_rf_from_h2o_emis()
         self.o3_rf_from_h2o_emis()
         self.o3_rf_from_h2_emis()
@@ -352,7 +355,7 @@ class RadiativeForcing:
         """This function returns the net radiative forcing
         from ozone (H2O, H2, NO emission)."""
 
-        # calculate radiative forcings for each point of trajectory
+        # Calculate individual radiative forcings
         self.o3_rf_from_h2o_emis()
         self.o3_rf_from_h2_emis()
         self.o3_rf_from_no_emis()
@@ -370,7 +373,7 @@ class RadiativeForcing:
         """This function returns the net radiative forcing
         from water vapour (H2O emission)."""
 
-        # calculate radiative forcings for each point of trajectory
+        # Calculate individual radiative forcings
         self.h2o_rf_from_h2o_emis()
 
         # Calculate net of all individual h2o radiative forcings
