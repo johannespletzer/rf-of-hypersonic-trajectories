@@ -1,6 +1,6 @@
 # Radiative forcing of hypersonic aircraft emission inventories
 The software quantifies climate impact of hypersonic aircraft emission inventories as a number and within seconds instead of very long numerical simulations that produce Petabytes of data. The input requires water vapor, hydrogen and nitrogen oxide emission data along flight trajectories.
-The repository provides a Python package, examples and an executable to calculate the climate impact (stratosphere adjusted radiative forcing) of hypersonic aircraft emission inventories. The radiative forcing of water vapour changes and ozone changes are calculated on the basis of water vapour, hydrogen and nitrogen oxide emissions. The current version is able to read in mat- and nc-files. NetCDF read in is currently optimised for data published on [zenodo.org](https://zenodo.org/records/10818082).
+The repository provides a Python package, examples and an executable to calculate the climate impact (stratosphere adjusted radiative forcing) of hypersonic aircraft emission inventories. The radiative forcing of water vapour changes and ozone changes are calculated on the basis of water vapour, hydrogen and nitrogen oxide emissions. The current version is able to read in mat- and nc-files. NetCDF read in is currently optimised for data published online, e.g. for the aircraft dseign [STRATOFLY-MR3](https://zenodo.org/records/10818082).
 
 Latest software release: [![DOI](https://zenodo.org/badge/518852238.svg)](https://zenodo.org/badge/latestdoi/518852238)
 
