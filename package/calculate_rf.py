@@ -26,29 +26,29 @@ class RadiativeForcing:
 
         self.load_sensitivities()
 
-        if self.filepath.endswith('.mat'):
+        if self.filepath.endswith(".mat"):
             self.data = self.load_mat_as_dataframe()
-        elif self.filepath.endswith('.nc'):
+        elif self.filepath.endswith(".nc"):
             self.data = self.load_nc_as_dataframe()
         else:
-            file_format = self.filepath.split('.')[-1]
-            raise OSError(f'Unknown format: {file_format}')
+            file_format = self.filepath.split(".")[-1]
+            raise OSError(f"Unknown format: {file_format}")
 
     def load_sensitivities(self):
         """Load radiative sensitivities calculated with numerical climate model
         from file and store as lists"""
 
-        with open(self.resources_dir+'/rf_sensitivities.txt', encoding='UTF-8') as f:
-            self.rf_sens = [[float(x) for x in line.split(',')] for line in f]
+        with open(self.resources_dir + "/rf_sensitivities.txt", encoding="UTF-8") as f:
+            self.rf_sens = [[float(x) for x in line.split(",")] for line in f]
 
-        # Sensitivities for outer edges and mid points of latitude regions
-        self.lat_mid_point           = self.rf_sens[0]
-        self.o3_rf_at_30_km_for_h2   = self.rf_sens[1]
-        self.o3_rf_at_38_km_for_h2   = self.rf_sens[2]
-        self.o3_rf_at_30_km_for_h2o  = self.rf_sens[3]
-        self.o3_rf_at_38_km_for_h2o  = self.rf_sens[4]
-        self.o3_rf_at_30_km_for_no   = self.rf_sens[5]
-        self.o3_rf_at_38_km_for_no   = self.rf_sens[6]
+        # sensitivities for outer edges and mid points of latitude regions
+        self.lat_mid_point = self.rf_sens[0]
+        self.o3_rf_at_30_km_for_h2 = self.rf_sens[1]
+        self.o3_rf_at_38_km_for_h2 = self.rf_sens[2]
+        self.o3_rf_at_30_km_for_h2o = self.rf_sens[3]
+        self.o3_rf_at_38_km_for_h2o = self.rf_sens[4]
+        self.o3_rf_at_30_km_for_no = self.rf_sens[5]
+        self.o3_rf_at_38_km_for_no = self.rf_sens[6]
         self.h2o_rf_at_30_km_for_h2o = self.rf_sens[7]
         self.h2o_rf_at_38_km_for_h2o = self.rf_sens[8]
 
@@ -112,46 +112,55 @@ class RadiativeForcing:
 
         nc_file = open_dataset(self.filepath)
 
-        nc_file['Area [km2]'] = ca(nc_file.lon,nc_file.lat) / 1e6
+        nc_file["Area [km2]"] = ca(nc_file.lon, nc_file.lat) / 1e6
 
         data_frame = nc_file.to_dataframe()
 
-        # Increase calculation speed by removing rows with zero emission
-        data_frame = data_frame[data_frame[['H2','H2O','NO']].sum(axis=1) != 0]
+        # increase calculation speed by removing rows with zero emission
+        data_frame = data_frame[data_frame[["H2", "H2O", "NO"]].sum(axis=1) != 0]
         data_frame.reset_index(inplace=True)
 
         columns = [
-                    "time",
-                    "Altitude [ft]",
-                    "Latitude",
-                    "Longitude",
-                    "H2 [kg/km3]",
-                    "NO [kg/km3]",
-                    "H2O [kg/km3]",
-                    "Fuel",
-                    "distkm",
-                    "Area [km2]"
-                ]
+            "time",
+            "Altitude [ft]",
+            "Latitude",
+            "Longitude",
+            "H2 [kg/km3]",
+            "NO [kg/km3]",
+            "H2O [kg/km3]",
+            "Fuel",
+            "distkm",
+            "Area [km2]",
+        ]
 
         data_frame.columns = columns
 
-        # Altitude calculations
+        # altitude calculations
         data_frame["Altitude [km]"] = data_frame["Altitude [ft]"] * 0.3048 / 1000
-        data_frame['Altitude [Pa]'] = data_frame['Altitude [km]'].map(
-                                        lambda km: alt2press(km, alt_units='km', press_units='pa')
-                                        )
+        data_frame["Altitude [Pa]"] = data_frame["Altitude [km]"].map(
+            lambda km: alt2press(km, alt_units="km", press_units="pa")
+        )
 
-        # Grid calculations
-        data_frame["Volume [km3]"] = data_frame["Altitude [km]"] * data_frame["Area [km2]"]
+        # grid calculations
+        data_frame["Volume [km3]"] = (
+            data_frame["Altitude [km]"] * data_frame["Area [km2]"]
+        )
 
-        # Mass calculations
+        # mass calculations
         data_frame["H2 [kg]"] = data_frame["H2 [kg/km3]"] * data_frame["Volume [km3]"]
         data_frame["H2O [kg]"] = data_frame["H2O [kg/km3]"] * data_frame["Volume [km3]"]
         data_frame["NO [kg]"] = data_frame["NO [kg/km3]"] * data_frame["Volume [km3]"]
 
-        # Filter for final DataFrame
-        columns = ["Latitude", "Longitude", "Altitude [km]",
-                   "Altitude [Pa]", "H2 [kg]", "H2O [kg]", "NO [kg]"]
+        # filter for final DataFrame
+        columns = [
+            "Latitude",
+            "Longitude",
+            "Altitude [km]",
+            "Altitude [Pa]",
+            "H2 [kg]",
+            "H2O [kg]",
+            "NO [kg]",
+        ]
         data_frame = data_frame[columns]
 
         return data_frame
@@ -219,21 +228,34 @@ class RadiativeForcing:
             )
             tropopause = tropopause.mean("timem").tp_WMO.to_series()
 
-            idx = self.data[["Latitude", "Longitude", "Altitude [km]"]]\
-                            .set_index(["Latitude", "Longitude", "Altitude [km]"])
+            idx = self.data[["Latitude", "Longitude", "Altitude [km]"]].set_index(
+                ["Latitude", "Longitude", "Altitude [km]"]
+            )
 
             idx.index.rename(["lat", "lon", "alt"], inplace=True)
 
-            merged_idx = merge(tropopause, idx, how='outer', left_index=True, right_index=True)
+            merged_idx = merge(
+                tropopause, idx, how="outer", left_index=True, right_index=True
+            )
 
             tropopause_reidx = tropopause.reindex_like(merged_idx)
-            tropopause_reidx = tropopause_reidx.interpolate().reindex_like(idx).reset_index()
+            tropopause_reidx = (
+                tropopause_reidx.interpolate().reindex_like(idx).reset_index()
+            )
 
-            tropopause_reidx.columns = ["Latitude", "Longitude", "Altitude [km]", "tp_WMO [Pa]"]
+            tropopause_reidx.columns = [
+                "Latitude",
+                "Longitude",
+                "Altitude [km]",
+                "tp_WMO [Pa]",
+            ]
 
-            self.data = merge(tropopause_reidx, self.data
-                              , left_on=["Latitude", "Longitude", "Altitude [km]"]
-                              , right_on=["Latitude", "Longitude", "Altitude [km]"])
+            self.data = merge(
+                tropopause_reidx,
+                self.data,
+                left_on=["Latitude", "Longitude", "Altitude [km]"],
+                right_on=["Latitude", "Longitude", "Altitude [km]"],
+            )
 
             # drop data below tropopause, drop tropopause variable
             self.data.drop(
@@ -337,13 +359,13 @@ class RadiativeForcing:
         """This function returns the net radiative forcing from ozone
         (H2O, H2, NO emission) and water vapour (H2O emission)."""
 
-        # Calculate individual radiative forcings
+        # calculate individual radiative forcings
         self.h2o_rf_from_h2o_emis()
         self.o3_rf_from_h2o_emis()
         self.o3_rf_from_h2_emis()
         self.o3_rf_from_no_emis()
 
-        # Calculate net of all individual radiative forcings
+        # calculate net of all individual radiative forcings
         net = (
             self.data["H2O RF from H2O [mW m-2]"].sum()
             + self.data["O3 RF from H2O [mW m-2]"].sum()
@@ -357,12 +379,12 @@ class RadiativeForcing:
         """This function returns the net radiative forcing
         from ozone (H2O, H2, NO emission)."""
 
-        # Calculate individual radiative forcings
+        # calculate individual radiative forcings
         self.o3_rf_from_h2o_emis()
         self.o3_rf_from_h2_emis()
         self.o3_rf_from_no_emis()
 
-        # Calculate net of all individual o3 radiative forcings
+        # calculate net of all individual o3 radiative forcings
         net = (
             self.data["O3 RF from H2O [mW m-2]"].sum()
             + self.data["O3 RF from H2 [mW m-2]"].sum()
@@ -375,10 +397,10 @@ class RadiativeForcing:
         """This function returns the net radiative forcing
         from water vapour (H2O emission)."""
 
-        # Calculate individual radiative forcings
+        # calculate individual radiative forcings
         self.h2o_rf_from_h2o_emis()
 
-        # Calculate net of all individual h2o radiative forcings
+        # calculate net of all individual h2o radiative forcings
         net = self.data["H2O RF from H2O [mW m-2]"].sum()
 
         return net
@@ -387,7 +409,7 @@ class RadiativeForcing:
         """This function returns a list of the mass emissioni
         in tons (H2O, H2, NO) for the selected altitude."""
 
-        # Calculate mass emission
+        # calculate mass emission
         h2o_emis = round(self.data["H2O [kg]"].sum() / 1e3, 2)
         h2_emis = round(self.data["H2 [kg]"].sum() / 1e3, 2)
         no_emis = round(self.data["NO [kg]"].sum() / 1e3, 2)
