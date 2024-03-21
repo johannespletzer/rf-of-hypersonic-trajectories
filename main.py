@@ -7,7 +7,7 @@ from glob import glob
 
 from package import to_excel as rte
 
-from package import rf_of_trajectory as rot
+from package import calculate_rf as rot
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
         )
         sys.exit(1)
 
-    files = glob(filepath + "/*Traj*.mat")
+    files = glob(filepath + "/*.mat")
     labels = [a.rsplit("ory_",maxsplit=1)[-1].split("_2022",maxsplit=1)[0] for a in files]
 
     # Create lists for each radiative forcing
@@ -31,10 +31,10 @@ def main():
 
     # Calculate radiative forcing for each trajectory
     for file in files:
-        trajectory = rot.RadiativeForcingOfTrajectory(file.split()[-1])
+        trajectory = rot.EmissionInventory(file.split()[-1])
 
         # Load data
-        trajectory.load_trajectory_as_dataframe()
+        trajectory.load_mat_as_dataframe()
 
         # Mask values below tropopause
         trajectory.drop_vertical_levels()

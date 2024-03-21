@@ -11,7 +11,7 @@ from xarray import open_dataset
 from package.calculate_area import calculate_area as ca
 
 
-class RadiativeForcing:
+class EmissionInventory:
     """The class contains multiple functions to calculate the radiative forcing
     of trace gases emitted up to 40 km. The calculations are based on pandas data structure.
     It is highly recommended to use the mask of tropospheric emission, since
