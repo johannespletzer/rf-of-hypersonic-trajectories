@@ -94,18 +94,9 @@ class EmissionInventory:
 
         data_frame = data_frame[data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0]
 
-        # select final DataFrame
-        data_frame = data_frame[
-            [
-                "Latitude",
-                "Longitude",
-                "Altitude [km]",
-                "Altitude [Pa]",
-                "H2O [kg]",
-                "NO [kg]",
-                "H2 [kg]",
-            ]
-        ]
+        # filter final DataFrame
+        data_frame.drop(["Altitude [ft]","H2O","H2","NO","dt"], axis=1, inplace=True)
+
         data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
 
         return data_frame
@@ -157,6 +148,10 @@ class EmissionInventory:
         ] 
         
         data_frame.columns = columns
+
+        data_frame.drop(["Volume [m3]"], axis=1, inplace=True)
+
+        data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
 
         return data_frame
 
