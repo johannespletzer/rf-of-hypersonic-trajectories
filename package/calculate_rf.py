@@ -92,10 +92,14 @@ class EmissionInventory:
         data_frame["NO [kg]"] = data_frame["NO"] * data_frame["dt"] / 1000
         data_frame["H2 [kg]"] = data_frame["H2"] * data_frame["dt"] / 1000
 
-        data_frame = data_frame[data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0]
+        data_frame = data_frame[
+            data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0
+        ]
 
         # filter final DataFrame
-        data_frame.drop(["Altitude [ft]","H2O","H2","NO","dt"], axis=1, inplace=True)
+        data_frame.drop(
+            ["Altitude [ft]", "H2O", "H2", "NO", "dt"], axis=1, inplace=True
+        )
 
         data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
 
@@ -108,32 +112,38 @@ class EmissionInventory:
 
         # calculate height, area and volume of boxes
         km = nc_file.alt * 0.3048 / 1000
-        nc_file = nc_file.assign_coords({'km':km})
-        
-        boxh = diff(insert(nc_file.km.values,0,0))
-        nc_file = nc_file.assign_coords({'boxheight':("alt",boxh)})
-        
+        nc_file = nc_file.assign_coords({"km": km})
+
+        boxh = diff(insert(nc_file.km.values, 0, 0))
+        nc_file = nc_file.assign_coords({"boxheight": ("alt", boxh)})
+
         nc_file["Area [km2]"] = ca(nc_file.lat, nc_file.lon) / 1e6
         nc_file["Volume [km3]"] = nc_file["Area [km2]"] * nc_file.boxheight
-        
+
         # calculate pressure levels
-        pa = [alt2press(km, alt_units="km", press_units="pa") for km in nc_file.km.values]
-        nc_file = nc_file.assign_coords({'Altitude [Pa]': ("alt",pa)})
-        
+        pa = [
+            alt2press(km, alt_units="km", press_units="pa") for km in nc_file.km.values
+        ]
+        nc_file = nc_file.assign_coords({"Altitude [Pa]": ("alt", pa)})
+
         nc_file["H2O [kg]"] = nc_file["H2O"] * nc_file["Volume [km3]"]
-        
+
         nc_file["H2 [kg]"] = nc_file["H2"] * nc_file["Volume [km3]"]
-        
+
         nc_file["NO [kg]"] = nc_file["NO"] * nc_file["Volume [km3]"]
-        
-        nc_file = nc_file.drop_vars(["boxheight","Area [km2]","distkm","Fuel","H2","NO","H2O"])
-        
+
+        nc_file = nc_file.drop_vars(
+            ["boxheight", "Area [km2]", "distkm", "Fuel", "H2", "NO", "H2O"]
+        )
+
         data_frame = nc_file.to_dataframe()
-        
+
         # increase calculation speed by removing rows with zero emission
-        data_frame = data_frame[data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0]
+        data_frame = data_frame[
+            data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0
+        ]
         data_frame.reset_index(inplace=True)
-        
+
         # rename columns
         columns = [
             "Altitude [ft]",
@@ -145,11 +155,11 @@ class EmissionInventory:
             "H2O [kg]",
             "H2 [kg]",
             "NO [kg]",
-        ] 
-        
+        ]
+
         data_frame.columns = columns
 
-        data_frame.drop(["Volume [m3]"], axis=1, inplace=True)
+        data_frame.drop(["Volume [km3]"], axis=1, inplace=True)
 
         data_frame = data_frame.apply(to_numeric, downcast="float", errors="coerce")
 
