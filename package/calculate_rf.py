@@ -92,6 +92,7 @@ class EmissionInventory:
         data_frame["NO [kg]"] = data_frame["NO"] * data_frame["dt"] / 1000
         data_frame["H2 [kg]"] = data_frame["H2"] * data_frame["dt"] / 1000
 
+        # increase calculation speed by removing rows with zero emission
         data_frame = data_frame[
             data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0
         ]
