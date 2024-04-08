@@ -6,7 +6,7 @@ and partly changed by Johannes Pletzer.
 Author: Mattia Righi (DLR, Germany).
 """
 
-from numpy import sign, insert, append, deg2rad, sin, outer
+from numpy import append, deg2rad, insert, outer, sign, sin
 from xarray import DataArray
 
 EARTH_RADIUS = 6371000.0  # [m]

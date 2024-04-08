@@ -2,12 +2,10 @@
    and return the radiative forcing in an excel file."""
 
 import sys
-
 from glob import glob
 
-from package import to_excel as rte
-
 from package import calculate_rf as rot
+from package import to_excel as rte
 
 
 def main():

@@ -2,12 +2,12 @@
 
 from os import path
 
-from pandas import DataFrame, merge, to_numeric
 from aerocalc3.std_atm import alt2press
+from numpy import diff, insert
+from pandas import DataFrame, merge, to_numeric
 from scipy.interpolate import interp1d
-from xarray import open_dataset
-from numpy import insert, diff
 from scipy.io import loadmat
+from xarray import open_dataset
 
 from package.calculate_area import calculate_area as ca
 
