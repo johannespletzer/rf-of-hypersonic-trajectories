@@ -12,7 +12,7 @@ from package import calculate_rf as rot
 
 def main():
     """Main code. Loads files and extracts labels, calculates
-       radiative forcing, writes to excel file."""
+    radiative forcing, writes to excel file."""
 
     try:
         filepath = sys.argv[1]
@@ -23,8 +23,8 @@ def main():
         )
         sys.exit(1)
 
-    files = glob(filepath + "/*.nc")+glob(filepath + "/*.mat")
-    file_names = [a.split('/')[-1] for a in files]
+    files = glob(filepath + "/*.nc") + glob(filepath + "/*.mat")
+    file_names = [a.split("/")[-1] for a in files]
 
     # Create lists for each radiative forcing
     tot_rf, h2o_rf, o3_rf = [], [], []
