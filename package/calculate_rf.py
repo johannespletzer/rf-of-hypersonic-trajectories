@@ -112,7 +112,9 @@ class EmissionInventory:
 
         nc_file = open_dataset(self.filepath)
 
-        nc_file["Area [km2]"] = ca(nc_file.lon, nc_file.lat) / 1e6
+        nc_file = nc_file.where((nc_file.H2O != 0) & (nc_file.H2 != 0) & (nc_file.NO != 0),drop=True)
+
+        nc_file["Area [km2]"] = ca(nc_file.lat, nc_file.lon) / 1e6
 
         data_frame = nc_file.to_dataframe()
 
