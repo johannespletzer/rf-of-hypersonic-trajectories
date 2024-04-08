@@ -34,6 +34,6 @@ The repo contains two example notebooks for processing of emission inventories i
 The code was formatted according to PEP 8 style with the help of the modules 'flake8', 'isort', 'pylint' and 'black'.
 
 # Acknowledgements
-Daniel Bodmer contributed with validation of model results by offering current state of the art hypersonic aircraft trajectories on aircraft and fleet level: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10818082.svg)](https://doi.org/10.5281/zenodo.10818082)
+Daniel Bodmer contributed with validation of model results by offering current state of the art hypersonic aircraft emission inventories on trajectory and route network level: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10818082.svg)](https://doi.org/10.5281/zenodo.10818082)
 
 
