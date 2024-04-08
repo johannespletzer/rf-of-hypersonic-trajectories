@@ -2,11 +2,12 @@
 
 from os import path
 
-from aerocalc3.std_atm import alt2press
 from pandas import DataFrame, merge, to_numeric
+from aerocalc3.std_atm import alt2press
 from scipy.interpolate import interp1d
-from scipy.io import loadmat
 from xarray import open_dataset
+from numpy import insert, diff
+from scipy.io import loadmat
 
 from package.calculate_area import calculate_area as ca
 
@@ -91,6 +92,8 @@ class EmissionInventory:
         data_frame["NO [kg]"] = data_frame["NO"] * data_frame["dt"] / 1000
         data_frame["H2 [kg]"] = data_frame["H2"] * data_frame["dt"] / 1000
 
+        data_frame = data_frame[data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0]
+
         # select final DataFrame
         data_frame = data_frame[
             [
@@ -110,58 +113,50 @@ class EmissionInventory:
     def load_nc_as_dataframe(self):
         """This function creates a DataFrame from a netcdf file and selects certain variables."""
 
-        nc_file = open_dataset(self.filepath)
+        nc_file = open_dataset(self.filepath).mean("time")
 
-        nc_file["Area [km2]"] = ca(nc_file.lon, nc_file.lat) / 1e6
-
+        # calculate height, area and volume of boxes
+        km = nc_file.alt * 0.3048 / 1000
+        nc_file = nc_file.assign_coords({'km':km})
+        
+        boxh = diff(insert(nc_file.km.values,0,0))
+        nc_file = nc_file.assign_coords({'boxheight':("alt",boxh)})
+        
+        nc_file["Area [km2]"] = ca(nc_file.lat, nc_file.lon) / 1e6
+        nc_file["Volume [km3]"] = nc_file["Area [km2]"] * nc_file.boxheight
+        
+        # calculate pressure levels
+        pa = [alt2press(km, alt_units="km", press_units="pa") for km in nc_file.km.values]
+        nc_file = nc_file.assign_coords({'Altitude [Pa]': ("alt",pa)})
+        
+        nc_file["H2O [kg]"] = nc_file["H2O"] * nc_file["Volume [km3]"]
+        
+        nc_file["H2 [kg]"] = nc_file["H2"] * nc_file["Volume [km3]"]
+        
+        nc_file["NO [kg]"] = nc_file["NO"] * nc_file["Volume [km3]"]
+        
+        nc_file = nc_file.drop_vars(["boxheight","Area [km2]","distkm","Fuel","H2","NO","H2O"])
+        
         data_frame = nc_file.to_dataframe()
-
+        
         # increase calculation speed by removing rows with zero emission
-        data_frame = data_frame[data_frame[["H2", "H2O", "NO"]].sum(axis=1) != 0]
+        data_frame = data_frame[data_frame[["H2 [kg]", "H2O [kg]", "NO [kg]"]].sum(axis=1) != 0]
         data_frame.reset_index(inplace=True)
-
+        
+        # rename columns
         columns = [
-            "time",
             "Altitude [ft]",
             "Latitude",
             "Longitude",
-            "H2 [kg/km3]",
-            "NO [kg/km3]",
-            "H2O [kg/km3]",
-            "Fuel",
-            "distkm",
-            "Area [km2]",
-        ]
-
-        data_frame.columns = columns
-
-        # altitude calculations
-        data_frame["Altitude [km]"] = data_frame["Altitude [ft]"] * 0.3048 / 1000
-        data_frame["Altitude [Pa]"] = data_frame["Altitude [km]"].map(
-            lambda km: alt2press(km, alt_units="km", press_units="pa")
-        )
-
-        # grid calculations
-        data_frame["Volume [km3]"] = (
-            data_frame["Altitude [km]"] * data_frame["Area [km2]"]
-        )
-
-        # mass calculations
-        data_frame["H2 [kg]"] = data_frame["H2 [kg/km3]"] * data_frame["Volume [km3]"]
-        data_frame["H2O [kg]"] = data_frame["H2O [kg/km3]"] * data_frame["Volume [km3]"]
-        data_frame["NO [kg]"] = data_frame["NO [kg/km3]"] * data_frame["Volume [km3]"]
-
-        # filter for final DataFrame
-        columns = [
-            "Latitude",
-            "Longitude",
             "Altitude [km]",
+            "Volume [km3]",
             "Altitude [Pa]",
-            "H2 [kg]",
             "H2O [kg]",
+            "H2 [kg]",
             "NO [kg]",
-        ]
-        data_frame = data_frame[columns]
+        ] 
+        
+        data_frame.columns = columns
 
         return data_frame
 
