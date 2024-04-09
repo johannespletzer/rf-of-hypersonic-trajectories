@@ -9,15 +9,15 @@ def to_excel(labels, tot_rf, h2o_rf, o3_rf):
     # Create DataFrame from lists
     data_frame = DataFrame([labels, tot_rf, h2o_rf, o3_rf]).T
     data_frame.columns = [
-        "Trajectory",
+        "Emission file",
         "RF [mW m-2]",
         "H2O RF [mW m-2]",
         "O3 RF [mW m-2]",
     ]
-    data_frame.set_index("Trajectory", inplace=True)
+    #data_frame.set_index("Emission file", inplace=True)
 
     # Write excel file
-    writer = ExcelWriter("rf_of_trajectories.xlsx")
+    writer = ExcelWriter("output_rf.xlsx")
     data_frame.to_excel(
         writer,
         sheet_name="Radiative Forcing",
